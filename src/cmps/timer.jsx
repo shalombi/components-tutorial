@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react"
 
 export const Timer = ({ time }) => {
+    const [timerMode, setTimerMode] = useState({ isStart: false, isStopped: false })
 
     const intervalIdRef = useRef()
     let [count, setCount] = useState(time)
 
     useEffect(() => {
         console.log('time:', time)
-        startInterval()
+        // startInterval()
     }, [])
 
     useEffect(() => {
@@ -18,9 +19,10 @@ export const Timer = ({ time }) => {
 
     const startInterval = () => {
         if (!intervalIdRef.current) {
-        intervalIdRef.current = setInterval(() => {
-            setCount(count => count - 1)
-        }, 1000)
+            setTimerMode(timerMode => ({ ...timerMode, isStart: true, isStopped: false }))
+            intervalIdRef.current = setInterval(() => {
+                setCount(count => count - 1)
+            }, 1000)
         }
 
 
@@ -28,6 +30,9 @@ export const Timer = ({ time }) => {
     const stopTimer = () => {
         clearInterval(intervalIdRef.current)
         intervalIdRef.current = ''
+
+        setTimerMode(timerMode => ({ ...timerMode, isStopped: true }))
+        // console.log(timerMode.isStart, !intervalIdRef.current)
     }
 
 
@@ -44,8 +49,11 @@ export const Timer = ({ time }) => {
         <section className="timer">
             <h3>Timer</h3>
             time: {convertToTime(count)}
-            <button onClick={stopTimer}>stop timer</button>
-            <button onClick={startInterval} >continue timer</button>
+            {intervalIdRef.current && <button onClick={stopTimer}>stop timer</button>}
+            {timerMode.isStart && !intervalIdRef.current &&
+                <button onClick={startInterval} >
+                    <h2>continue timer</h2>
+                </button>}
         </section>
     )
 }
